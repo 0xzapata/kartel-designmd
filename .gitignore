@@ -3,3 +3,7 @@
 .dolt/
 *.db
 .beads-credential-key
+
+# Local assets
+.beads/
+docs/
