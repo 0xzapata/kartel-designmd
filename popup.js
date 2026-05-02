@@ -469,7 +469,7 @@ async function captureFullPageScreenshot(tabId, pageInfo, format = 'jpeg') {
   }
 
   // Multi-scroll capture
-  const maxSteps = 20; // More steps for longer pages
+  const maxSteps = 10; // Limit to avoid rate limiting
   const captures = [];
 
   // Store original scroll position
@@ -490,7 +490,8 @@ async function captureFullPageScreenshot(tabId, pageInfo, format = 'jpeg') {
       args: [yOffset]
     });
 
-    await new Promise(r => setTimeout(r, 300));
+    // Wait for scroll to settle and respect rate limit (1 capture/sec)
+    await new Promise(r => setTimeout(r, 1000));
 
     const dataUrl = await chrome.tabs.captureVisibleTab(null, { format, quality: 100 });
     captures.push({ dataUrl, yOffset });
