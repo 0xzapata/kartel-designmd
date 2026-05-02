@@ -8,8 +8,13 @@
 // Listen for messages from popup/background
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.type === "EXTRACT_TOKENS") {
-    const tokens = extractDesignSystem();
-    sendResponse(tokens);
+    try {
+      const tokens = extractDesignSystem();
+      // Send as JSON string to ensure proper serialization through message passing
+      sendResponse(JSON.parse(JSON.stringify(tokens)));
+    } catch (err) {
+      sendResponse({ error: err.message });
+    }
   } else if (request.type === "CAPTURE_SCREENSHOT") {
     captureScreenshot(request.options)
       .then(screenshot => sendResponse({ success: true, screenshot }))

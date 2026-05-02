@@ -477,6 +477,7 @@ async function captureFullPageScreenshot(tabId, pageInfo, format = 'jpeg') {
     target: { tabId },
     func: () => ({ x: window.scrollX, y: window.scrollY })
   });
+  const originalPos = originalScroll[0].result;
 
   const numSteps = Math.min(Math.ceil(scrollHeight / clientHeight), maxSteps);
 
@@ -501,7 +502,7 @@ async function captureFullPageScreenshot(tabId, pageInfo, format = 'jpeg') {
   await chrome.scripting.executeScript({
     target: { tabId },
     func: (pos) => window.scrollTo(pos.x, pos.y),
-    args: [originalScroll.result]
+    args: [{ x: originalPos.x, y: originalPos.y }]
   });
 
   // Stitch images

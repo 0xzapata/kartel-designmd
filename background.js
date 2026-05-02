@@ -62,37 +62,32 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
 async function handleGenerate(request) {
   const { provider, apiKey, model, baseUrl, tokens, screenshotBase64 } = request;
-  const requestId = Date.now().toString();
 
   try {
-    const result = callAI({ provider, apiKey, model, baseUrl, tokens, screenshotBase64 });
+    // Await the callAI promise
+    const result = await callAI({ provider, apiKey, model, baseUrl, tokens, screenshotBase64 });
 
+    // Handle streaming response
     if (result && typeof result[Symbol.asyncIterator] === 'function') {
-      // Streaming response
       let buffer = '';
-
       for await (const chunk of result) {
         buffer += chunk;
         chrome.runtime.sendMessage({
           type: 'CHUNK',
-          text: chunk,
-          percent: 0 // Progress updates handled by adapter
+          text: chunk
         });
       }
-
       chrome.runtime.sendMessage({ type: 'DONE' });
       return { success: true, output: buffer };
-
-    } else {
-      // Non-streaming response
-      chrome.runtime.sendMessage({
-        type: 'CHUNK',
-        text: result,
-        percent: 100
-      });
-      chrome.runtime.sendMessage({ type: 'DONE' });
-      return { success: true, output: result };
     }
+
+    // Non-streaming response - send as single chunk
+    chrome.runtime.sendMessage({
+      type: 'CHUNK',
+      text: result
+    });
+    chrome.runtime.sendMessage({ type: 'DONE' });
+    return { success: true, output: result };
 
   } catch (error) {
     console.error('[Background] Generation error:', error);
