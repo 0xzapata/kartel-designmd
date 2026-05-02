@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <!-- TOAST NOTIFICATION -->
+  <div id="toast" class="toast"></div>
+
+  <!-- SETTINGS SCREEN -->
+  <div id="settings-screen" class="screen hidden">
+    <div class="screen-header">
+      <button id="back-btn" class="btn-icon" title="Back">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><polyline points="12 19 5 12 12 5"/></svg>
+      </button>
+      <h2>Settings</h2>
+      <button id="export-settings" class="btn-icon" title="Export Settings">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+      </button>
+    </div>
+
+    <div class="settings-body">
+      <div class="field">
+        <label>Provider</label>
+        <div class="select-wrapper">
+          <select id="provider">
+            <option value="Gemini">Google Gemini</option>
+            <option value="OpenAI">OpenAI</option>
+            <option value="Claude">Anthropic Claude</option>
+            <option value="Ollama">Ollama (Local)</option>
+          </select>
+          <svg class="select-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+      </div>
+
+      <div class="field">
+        <div class="field-header">
+          <label>Model</label>
+          <button id="fetch-models" class="btn-fetch" type="button">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+            <span id="fetch-models-text">Fetch</span>
+          </button>
+        </div>
+        <div class="select-wrapper">
+          <select id="model"></select>
+          <svg class="select-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <input type="text" id="model-custom" placeholder="Or type custom model...">
+      </div>
+
+      <div class="field" id="api-key-container">
+        <label>API Key</label>
+        <div class="input-icon-wrapper">
+          <input type="password" id="api-key" placeholder="Paste your API key">
+          <button id="toggle-key-vis" class="btn-icon-inline" type="button" title="Show/Hide">
+            <svg id="eye-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="field hidden" id="base-url-container">
+        <label>Base URL</label>
+        <input type="text" id="base-url" placeholder="http://localhost:11434">
+      </div>
+
+      <div class="field">
+        <label>Screenshot Format</label>
+        <div class="select-wrapper">
+          <select id="screenshot-format">
+            <option value="jpeg">JPEG (smaller)</option>
+            <option value="png">PNG (lossless)</option>
+          </select>
+          <svg class="select-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+      </div>
+
+      <button id="save-settings" class="btn-primary btn-save">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        Save Settings
+      </button>
+
+      <div class="import-section">
+        <button id="import-settings" class="btn-sm">Import Settings</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- HISTORY SCREEN -->
+  <div id="history-screen" class="screen hidden">
+    <div class="screen-header">
+      <button id="back-from-history" class="btn-icon" title="Back">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><polyline points="12 19 5 12 12 5"/></svg>
+      </button>
+      <h2>History</h2>
+      <button id="clear-history" class="btn-icon" title="Clear All">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+      </button>
+    </div>
+    <div id="history-list"></div>
+  </div>
+
+  <!-- MAIN SCREEN -->
+  <div id="main-screen" class="screen">
+    <div class="main-header">
+      <div class="brand">
+        <div class="brand-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        </div>
+        <div class="brand-text">
+          <span class="brand-name">designmd</span>
+          <span class="brand-sub" id="current-info">
+            <span id="current-provider">Gemini</span> · <span id="current-model">gemini-2.0-flash</span>
+          </span>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button id="open-history" class="btn-icon" title="History">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        </button>
+        <button id="open-settings" class="btn-icon" title="Settings">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        </button>
+        <button id="toggle-dark-mode" class="btn-icon" title="Toggle Dark Mode">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- PREVIEW SECTION (NEW) -->
+    <div id="preview-container" class="hidden">
+      <div class="preview-header">
+        <span class="preview-label">Extracted Preview</span>
+        <button id="edit-tokens" class="btn-sm" title="Edit tokens before generating">Edit</button>
+      </div>
+      <div class="preview-content">
+        <div id="preview-tokens"></div>
+        <div id="preview-thumbnail"></div>
+      </div>
+    </div>
+
+    <button id="generate-btn" class="btn-generate">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+      <span id="generate-btn-text">Extract & Generate</span>
+    </button>
+
+    <!-- LOADING WITH PROGRESS (NEW) -->
+    <div id="loading-container" class="hidden">
+      <div class="progress-bar">
+        <div id="progress-fill" class="progress-fill"></div>
+      </div>
+      <div class="progress-text">
+        <span id="loading-text">Extracting styles...</span>
+        <span id="progress-percent">0%</span>
+      </div>
+      <button id="cancel-btn" class="btn-cancel hidden">Cancel</button>
+    </div>
+
+    <!-- OUTPUT SECTION -->
+    <div id="output-container" class="hidden">
+      <div class="output-header">
+        <span class="output-label">Generated design.md</span>
+        <div class="output-actions">
+          <button id="copy-btn" class="btn-sm" title="Copy to clipboard">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            <span id="copy-btn-text">Copy</span>
+          </button>
+          <button id="download-btn" class="btn-sm" title="Download as design.md">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Download
+          </button>
+        </div>
+      </div>
+      <textarea id="output" placeholder="Generated markdown will appear here..."></textarea>
+    </div>
+  </div>
+
+  <!-- TOKEN EDITOR MODAL -->
+  <div id="token-editor" class="modal hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Edit Tokens</h3>
+        <button id="close-token-editor" class="btn-icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <textarea id="token-editor-input"></textarea>
+      <div class="modal-actions">
+        <button id="cancel-token-edit" class="btn-sm">Cancel</button>
+        <button id="save-token-edit" class="btn-primary">Use Tokens</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

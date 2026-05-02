@@ -1,0 +1,7 @@
+{
+  "database": "dolt",
+  "backend": "dolt",
+  "dolt_mode": "embedded",
+  "dolt_database": "designmd_chrome_ext",
+  "project_id": "0fc99d61-b197-4c8b-bd08-883aeee74efa"
+}
