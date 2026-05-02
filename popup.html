@@ -31,6 +31,7 @@
             <option value="OpenAI">OpenAI</option>
             <option value="Claude">Anthropic Claude</option>
             <option value="Ollama">Ollama (Local)</option>
+            <option value="Custom">Custom (OpenAI Compatible)</option>
           </select>
           <svg class="select-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
         </div>
@@ -64,6 +65,11 @@
       <div class="field hidden" id="base-url-container">
         <label>Base URL</label>
         <input type="text" id="base-url" placeholder="http://localhost:11434">
+      </div>
+
+      <div class="field hidden" id="custom-model-container">
+        <label>API Endpoint</label>
+        <input type="text" id="custom-endpoint" placeholder="https://api.example.com/v1/chat/completions">
       </div>
 
       <div class="field">

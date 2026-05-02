@@ -8,7 +8,8 @@ const DEFAULT_MODELS = {
   Gemini: 'gemini-2.0-flash',
   OpenAI: 'gpt-4o',
   Claude: 'claude-sonnet-4-20250514',
-  Ollama: 'llama3'
+  Ollama: 'llama3',
+  Custom: 'gpt-4o'
 };
 
 let currentTokens = null;
@@ -32,11 +33,12 @@ function initDarkMode() {
 }
 
 function loadSettings() {
-  chrome.storage.local.get(['provider', 'model', 'apiKey', 'baseUrl', 'screenshotFormat'], (data) => {
+  chrome.storage.local.get(['provider', 'model', 'apiKey', 'baseUrl', 'customEndpoint', 'screenshotFormat'], (data) => {
     const provider = data.provider || 'Gemini';
     inputProvider.value = provider;
     inputApiKey.value = data.apiKey || '';
     inputBaseUrl.value = data.baseUrl || 'http://localhost:11434';
+    inputCustomEndpoint.value = data.customEndpoint || '';
     inputScreenshotFormat.value = data.screenshotFormat || 'jpeg';
 
     populateModelDropdown([data.model || DEFAULT_MODELS[provider]]);
@@ -144,6 +146,7 @@ const inputBaseUrl = document.getElementById('base-url');
 const inputScreenshotFormat = document.getElementById('screenshot-format');
 const containerApiKey = document.getElementById('api-key-container');
 const containerBaseUrl = document.getElementById('base-url-container');
+const inputCustomEndpoint = document.getElementById('custom-endpoint');
 
 const btnBack = document.getElementById('back-btn');
 const btnSettings = document.getElementById('open-settings');
@@ -220,12 +223,21 @@ function showToast(message, type = 'info') {
 // =============== SETTINGS ===============
 
 function toggleProviderFields(provider) {
-  if (provider === 'Ollama') {
+  const customEndpointContainer = document.getElementById('custom-model-container');
+  
+  if (provider === 'Ollama' || provider === 'Custom') {
     containerApiKey.classList.add('hidden');
     containerBaseUrl.classList.remove('hidden');
+    // Show API Endpoint for Custom
+    if (provider === 'Custom') {
+      customEndpointContainer.classList.remove('hidden');
+    } else {
+      customEndpointContainer.classList.add('hidden');
+    }
   } else {
     containerApiKey.classList.remove('hidden');
     containerBaseUrl.classList.add('hidden');
+    customEndpointContainer.classList.add('hidden');
   }
 }
 
@@ -251,6 +263,7 @@ function saveSettings() {
     model: selectedModel,
     apiKey: inputApiKey.value,
     baseUrl: inputBaseUrl.value,
+    customEndpoint: inputCustomEndpoint.value,
     screenshotFormat: inputScreenshotFormat.value
   };
   chrome.storage.local.set(config, () => {
@@ -310,6 +323,21 @@ async function fetchModels() {
       if (!res.ok) throw new Error('Cannot connect to Ollama');
       const data = await res.json();
       models = (data.models || []).map(m => m.name).sort();
+
+    } else if (provider === 'Custom') {
+      // For custom endpoints, fetch from the provided endpoint's /models path
+      const endpoint = inputBaseUrl.value.replace(/\/$/, '');
+      try {
+        const res = await fetch(`${endpoint}/models`, {
+          headers: apiKey ? { 'Authorization': `Bearer ${apiKey}` } : {}
+        });
+        if (!res.ok) throw new Error('Failed to fetch models');
+        const data = await res.json();
+        models = (data.data || data.models || []).map(m => m.id || m.name).sort();
+      } catch (e) {
+        // If /models fails, just use the custom model directly
+        showToast('Could not fetch models, enter manually', 'warning');
+      }
     }
 
     if (models.length > 0) {
@@ -414,7 +442,7 @@ async function generate() {
     btnCancel.classList.add('hidden');
 
     // Send to background for AI processing
-    const settings = await new Promise(resolve => chrome.storage.local.get(['provider', 'model', 'apiKey', 'baseUrl'], resolve));
+    const settings = await new Promise(resolve => chrome.storage.local.get(['provider', 'model', 'apiKey', 'baseUrl', 'customEndpoint'], resolve));
 
     abortController = new AbortController();
 
@@ -424,7 +452,7 @@ async function generate() {
       provider: settings.provider || 'Gemini',
       model: settings.model || DEFAULT_MODELS['Gemini'],
       apiKey: settings.apiKey,
-      baseUrl: settings.baseUrl,
+      baseUrl: settings.customEndpoint || settings.baseUrl,
       tokens: currentTokens,
       screenshotBase64: currentScreenshot
     }, (response) => {
